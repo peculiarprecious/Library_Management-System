@@ -64,14 +64,15 @@ BorrowRecord record1 = new BorrowRecord
     User = user1,
     BorrowDate = DateTime.Now
 };
-
+book1.IsAvailable = false; 
 BorrowRecord record2 = new BorrowRecord
 {
     Book = book2,
     User = user2,
+    
     BorrowDate = DateTime.Now
 };
-
+book2.IsAvailable = false; 
 // 6. Add Records to the list
 borrowHistory.Add(record1);
 borrowHistory.Add(record2);
@@ -87,8 +88,9 @@ while (isRunning)
     Console.WriteLine("3. Add Users");
     Console.WriteLine("4. View Users");
     Console.WriteLine("5. Borrow Book");
-    Console.WriteLine("6. Return Book");
-    Console.WriteLine("7. Exit");
+    Console.WriteLine("6. View Borrowed Books");
+    Console.WriteLine("7. Return Book");
+    Console.WriteLine("8. Exit");
 
     Console.Write("Enter choice: ");
     int userChoice = int.Parse(Console.ReadLine() ?? "");
@@ -185,7 +187,7 @@ while (isRunning)
                 Console.WriteLine("Error: Please enter a valid email address (e.g., user@example.com).");
                 break;
             }
-Console.Write("Enter House Address: ");
+            Console.Write("Enter House Address: ");
             string? address = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(address))
@@ -193,7 +195,7 @@ Console.Write("Enter House Address: ");
                 Console.WriteLine("Error: Address cannot be empty.");
                 break;
             }
-Console.Write("Enter Phone Number: ");
+            Console.Write("Enter Phone Number: ");
             string? phoneNumber = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(phoneNumber))
@@ -219,21 +221,21 @@ Console.Write("Enter Phone Number: ");
         case 4:
 
             Console.WriteLine("\n--- View all Users ---");
-if (users.Count == 0)
-{
-    Console.WriteLine("No users found. Please add a user first");
-}
-else
-{
-     // 2. Table Headers (Negative numbers = left align, Positive = right align)
-        Console.WriteLine($"{"ID",-5} | {"Full Name",-20} | {"Email",-25} | {"Address",-35} | {"Phone Number",-35}");
-        Console.WriteLine(new string('-', 110)); // Separator line
+            if (users.Count == 0)
+            {
+                Console.WriteLine("No users found. Please add a user first");
+            }
+            else
+            {
+                // Table Headers (Negative numbers = left align, Positive = right align)
+                Console.WriteLine($"{"ID",-5} | {"Full Name",-20} | {"Email",-25} | {"Address",-35} | {"Phone Number",-35}");
+                Console.WriteLine(new string('-', 110)); // Separator line
 
-    foreach (var u in users)
-    {
-        Console.WriteLine($"{u.UserId,-5} | {u.Name,-20} | {u.Email,-25} | {u.Address,-35} | {u.PhoneNumber,-35}");
-    }
-}
+                foreach (var u in users)
+                {
+                    Console.WriteLine($"{u.UserId,-5} | {u.Name,-20} | {u.Email,-25} | {u.Address,-35} | {u.PhoneNumber,-35}");
+                }
+            }
 
 
             break;
@@ -241,13 +243,92 @@ else
 
             Console.WriteLine("\n--- Borrow Book ---");
 
+            // Get user ID and check if the user exist
+
+            Console.WriteLine("Enter user Id:");
+            if (!int.TryParse(Console.ReadLine(), out int borrowUserId))
+            {
+                Console.WriteLine("Invalid ID format. Please enter an integer");
+                break;
+            }
+            var bUser = users.Find(u => u.UserId == borrowUserId);
+
+            if (bUser == null)
+            {
+                Console.WriteLine("Error: User not found.");
+
+                break;
+            }
+            //Get book by ID
+            Console.WriteLine("Enter Book Id:");
+
+            if (!int.TryParse(Console.ReadLine(), out int borrowBookId))
+            {
+                Console.WriteLine("Error: Invalid ID format. Id must be a number");
+                break;
+            }
+
+            // Check if book exists and is actually available
+            var bBook = books.Find(b => b.Id == borrowBookId);
+
+            if (bBook == null)
+            {
+                Console.WriteLine("Error: Book not found!");
+                break;
+            }
+            else if (!bBook.IsAvailable)
+            {
+                Console.WriteLine($"Error: '{bBook.Title}' is already borrowed.");
+                break;
+            }
+            else
+            {
+                //Update book status
+
+                bBook.IsAvailable = false;
+
+
+                //create the borrow record
+
+                BorrowRecord newRecord = new BorrowRecord
+                {
+                    Book = bBook,
+                    User = bUser,
+                    BorrowDate = DateTime.Now
+                };
+
+                borrowHistory.Add(newRecord);
+
+                Console.WriteLine($"\nSuccess! '{bBook.Title}' has been checked out to {bUser.Name}.");
+
+            }
+
             break;
         case 6:
+            Console.WriteLine("\n--- Borrow History ---");
+
+            if (borrowHistory.Count == 0)
+            {
+                Console.WriteLine("No borrow records found.");
+            }
+            else
+            {
+                // Table Headers
+                Console.WriteLine($"{"ID",-5} | {"Borrower Name",-20} | {"Book Title",-25} | {"Author",-35} | {"Borrw Date",-35}");
+                Console.WriteLine(new string('-', 110));
+
+                foreach (var bRecord in borrowHistory)
+                {
+                    Console.WriteLine($"{bRecord.Book.Id,-5} | {bRecord.User.Name,-20} | {bRecord.Book.Title,-25} | {bRecord.Book.Author,-35} | {bRecord.BorrowDate}");
+                }
+            }
+            break;
+        case 7:
 
             Console.WriteLine("\n--- Return Book ---");
 
             break;
-        case 7:
+        case 8:
             isRunning = false;
             Console.WriteLine("Exiting program...");
             break;
