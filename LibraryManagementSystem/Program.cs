@@ -36,21 +36,30 @@ Book book1 = new Book
     Id = 1,
     Title = "C# Basics",
     Author = "Wale Adenuga",
-    IsAvailable = true
+    ISBN = "978-0-13-468599-1",
+    TotalCopies = 5,
+    AvailableCopies = 5
+
 };
 Book book2 = new Book
 {
     Id = 2,
     Title = "OOP in C#",
     Author = "Mike Adekunle",
-    IsAvailable = true
+    ISBN = "978-0-596-52068-7",
+    TotalCopies = 10,
+    AvailableCopies = 10
+
 };
 Book book3 = new Book
 {
     Id = 3,
     Title = "Data Structures",
     Author = "Jame Richard",
-    IsAvailable = true
+    ISBN = "978-1-491-98765-1",
+    TotalCopies = 2,
+    AvailableCopies = 2
+
 };
 
 books.Add(book1);
@@ -64,15 +73,17 @@ BorrowRecord record1 = new BorrowRecord
     User = user1,
     BorrowDate = DateTime.Now
 };
-book1.IsAvailable = false; 
+
+book1.AvailableCopies--;
 BorrowRecord record2 = new BorrowRecord
 {
     Book = book2,
     User = user2,
-    
+
     BorrowDate = DateTime.Now
 };
-book2.IsAvailable = false; 
+
+book2.AvailableCopies--;
 // 6. Add Records to the list
 borrowHistory.Add(record1);
 borrowHistory.Add(record2);
@@ -122,13 +133,32 @@ while (isRunning)
                 Console.WriteLine("Error: Author cannot be empty.");
                 break;
             }
+            Console.WriteLine("Enter ISBN:");
+            string? isbn = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(isbn))
+            {
+                Console.WriteLine("Error: ISBN cannot be empty.");
+                break;
+            }
+
+            Console.WriteLine("Enter Total Copies:");
+
+            if (!int.TryParse(Console.ReadLine(), out int numberOfCopies))
+            {
+                Console.WriteLine("Invalid ID format. Please enter an integer");
+                break;
+            }
 
 
             Book NewBook = new Book
             {
                 Id = nextBookID,
                 Title = bookTitle,
-                Author = author
+                Author = author,
+                ISBN = isbn,
+                TotalCopies = numberOfCopies,
+                AvailableCopies = numberOfCopies
 
             };
 
@@ -138,7 +168,7 @@ while (isRunning)
         case 2:
             Console.WriteLine("\n--- LIBRARY COLLECTION ---");
             // Column Headers (Negative numbers align left, positive align right)
-            Console.WriteLine($"{"ID",-5} | {"Title",-25} | {"Author",-20} | {"Status"} ");
+            Console.WriteLine($"{"ID",-5} | {"Title",-25} | {"Author",-20} | {"ISBN",-20} | {"Total Cpoies",-20} | {"Available Cpoies",-20} | {"Status"} ");
             Console.WriteLine(new string('-', 70)); // Creates a separator line
 
             if (books.Count == 0)
@@ -151,7 +181,7 @@ while (isRunning)
                 {
                     string status = b.IsAvailable ? "Available" : "Borrowed";
 
-                    Console.WriteLine($"{b.Id,-5} | {b.Title,-25} | {b.Author,-20} | [{status}]");
+                    Console.WriteLine($"{b.Id,-5} | {b.Title,-25} | {b.Author,-20} | {b.ISBN,-20} | {b.TotalCopies,-20}  | {b.AvailableCopies,-20} | [{status}]");
                 }
             }
 
@@ -283,13 +313,10 @@ while (isRunning)
             }
             else
             {
-                //Update book status
+                 
+                bBook.AvailableCopies--;  // 1. Reduce available copies
 
-                bBook.IsAvailable = false;
-
-
-                //create the borrow record
-
+                // 4. Create the borrow record
                 BorrowRecord newRecord = new BorrowRecord
                 {
                     Book = bBook,
@@ -299,8 +326,8 @@ while (isRunning)
 
                 borrowHistory.Add(newRecord);
 
-                Console.WriteLine($"\nSuccess! '{bBook.Title}' has been checked out to {bUser.Name}.");
-
+                Console.WriteLine($"\nSuccess! '{bBook.Title}' has been borrowed by {bUser.Name}.");
+                Console.WriteLine($"Remaining copies in library: {bBook.TotalCopies}");
             }
 
             break;
@@ -314,12 +341,12 @@ while (isRunning)
             else
             {
                 // Table Headers
-                Console.WriteLine($"{"ID",-5} | {"Borrower Name",-20} | {"Book Title",-25} | {"Author",-35} | {"Borrw Date",-35}");
+                Console.WriteLine($"{"ID",-5} | {"Borrower Name",-15} | {"Book Title",-25} | {"Author",-25} | {"ISBN",-25}| {"Borrow Date",-15}");
                 Console.WriteLine(new string('-', 110));
 
                 foreach (var bRecord in borrowHistory)
                 {
-                    Console.WriteLine($"{bRecord.Book.Id,-5} | {bRecord.User.Name,-20} | {bRecord.Book.Title,-25} | {bRecord.Book.Author,-35} | {bRecord.BorrowDate}");
+                    Console.WriteLine($"{bRecord.Book.Id,-5} | {bRecord.User.Name,-15} | {bRecord.Book.Title,-25} | {bRecord.Book.Author,-25} | {bRecord.Book.ISBN,-25} | {bRecord.BorrowDate, -15}");
                 }
             }
             break;
