@@ -313,7 +313,7 @@ while (isRunning)
             }
             else
             {
-                 
+
                 bBook.AvailableCopies--;  // 1. Reduce available copies
 
                 // 4. Create the borrow record
@@ -341,18 +341,68 @@ while (isRunning)
             else
             {
                 // Table Headers
-                Console.WriteLine($"{"ID",-5} | {"Borrower Name",-15} | {"Book Title",-25} | {"Author",-25} | {"ISBN",-25}| {"Borrow Date",-15}");
-                Console.WriteLine(new string('-', 110));
+                Console.WriteLine($"{"Book ID",-5} | {"Book Title",-25} | {"User ID",-5} | {"Borrower Name",-15} | {"Author",-25} | {"ISBN",-25}| {"Borrow Date",-15}");
+                Console.WriteLine(new string('-', 130));
 
                 foreach (var bRecord in borrowHistory)
                 {
-                    Console.WriteLine($"{bRecord.Book.Id,-5} | {bRecord.User.Name,-15} | {bRecord.Book.Title,-25} | {bRecord.Book.Author,-25} | {bRecord.Book.ISBN,-25} | {bRecord.BorrowDate, -15}");
+                    Console.WriteLine($"{bRecord.Book.Id,-5} | {bRecord.Book.Title,-25} | {bRecord.User.UserId,-5} |  {bRecord.User.Name,-15} | {bRecord.Book.Author,-25} | {bRecord.Book.ISBN,-25} | {bRecord.BorrowDate,-15}");
                 }
             }
             break;
         case 7:
 
             Console.WriteLine("\n--- Return Book ---");
+
+            Console.WriteLine("Enter user Id:");
+            if (!int.TryParse(Console.ReadLine(), out int returnUserId))
+            {
+                Console.WriteLine("Invalid ID format. Please enter an integer");
+                break;
+            }
+            var rUser = users.Find(r => r.UserId == returnUserId);
+
+            if (rUser == null)
+            {
+                Console.WriteLine("Error: User not found.");
+
+                break;
+            }
+            //Get book by ID
+            Console.WriteLine("Enter Book Id:");
+
+            if (!int.TryParse(Console.ReadLine(), out int returnBookId))
+            {
+                Console.WriteLine("Error: Invalid ID format. Id must be a number");
+                break;
+            }
+
+            var rBook = books.Find(r => r.Id == returnBookId);
+
+            if (rBook == null)
+            {
+                Console.WriteLine("Error: Book not found!");
+                break;
+            }
+
+            // Find the specific record where this user and this book
+            var recordToReturn = borrowHistory.Find(r => r.User.UserId == returnUserId && r.Book.Id == returnBookId);
+
+            if (recordToReturn != null)
+            {
+                // 4. Update the book linked to the record
+                recordToReturn.Book.AvailableCopies++;
+
+                // 5. Remove the record from the list
+                borrowHistory.Remove(recordToReturn);
+
+                Console.WriteLine($"\nSuccess! '{recordToReturn.Book.Title}' was returned by {rUser.Name}.");
+                Console.WriteLine($"Current Book Inventory: {recordToReturn.Book.AvailableCopies} / {recordToReturn.Book.TotalCopies}");
+            }
+            else
+            {
+                Console.WriteLine("Error: No active borrow record found for this User and Book.");
+            }
 
             break;
         case 8:
