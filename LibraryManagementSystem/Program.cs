@@ -1,4 +1,5 @@
 ﻿
+using System.Text.RegularExpressions;
 using LibraryManagementSystem;
 
 // 1. Initialize empty lists
@@ -19,9 +20,9 @@ LibraryUser user1 = new LibraryUser
 LibraryUser user2 = new LibraryUser
 {
     UserId = 2,
-    Name = "Bob",
+    Name = "Bob Marley",
     Email = "bob@email.com",
-    Address = "Warsaw",
+    Address = "Lagos",
     PhoneNumber = "080987654321"
 };
 
@@ -102,7 +103,7 @@ while (isRunning)
             int nextBookID = books.Count + 1;
             Console.WriteLine($"(ID: {nextBookID})");
 
-            Console.WriteLine("\n---Enter Book Title");
+            Console.WriteLine("Enter Book Title:");
             string? bookTitle = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(bookTitle)) //String Validation: Title cannot be empty
@@ -111,7 +112,7 @@ while (isRunning)
                 break;
             }
 
-            Console.WriteLine("\n---Enter Author");
+            Console.WriteLine("Enter Author:");
             string? author = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(author)) //String Validation: Title cannot be empty
@@ -133,37 +134,107 @@ while (isRunning)
             Console.WriteLine($"\nSuccess! '{bookTitle}' added with ID: {nextBookID}");
             break;
         case 2:
-
-            
-
             Console.WriteLine("\n--- LIBRARY COLLECTION ---");
-    // Column Headers (Negative numbers align left, positive align right)
-    Console.WriteLine($"{"ID",-5} | {"Title",-25} | {"Author",-20} | {"Status"} ");
-    Console.WriteLine(new string('-', 70)); // Creates a separator line
+            // Column Headers (Negative numbers align left, positive align right)
+            Console.WriteLine($"{"ID",-5} | {"Title",-25} | {"Author",-20} | {"Status"} ");
+            Console.WriteLine(new string('-', 70)); // Creates a separator line
 
-             if (books.Count == 0)
-    {
-        Console.WriteLine("No books found in the library.");
-    }
-    else
-    {
-        foreach (var b in books)
-        {
-            string status = b.IsAvailable ? "Available" : "Borrowed";
-            
-            Console.WriteLine($"{b.Id,-5} | {b.Title,-25} | {b.Author,-20} | [{status}]");
-        }
-    }
+            if (books.Count == 0)
+            {
+                Console.WriteLine("No books found in the library.");
+            }
+            else
+            {
+                foreach (var b in books)
+                {
+                    string status = b.IsAvailable ? "Available" : "Borrowed";
 
-    break;
+                    Console.WriteLine($"{b.Id,-5} | {b.Title,-25} | {b.Author,-20} | [{status}]");
+                }
+            }
+
+            break;
         case 3:
 
             Console.WriteLine("\n--- Add New User ---");
+            int nextUserID = users.Count + 1;
+            Console.Write("Enter User Name: ");
 
+            string? userName = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(userName)) //String Validation: Name cannot be empty
+            {
+                Console.WriteLine("Error: Name cannot be empty.");
+                break;
+            }
+
+            Console.Write("Enter Email Address: ");
+
+            // Regex pattern for a basic email structure
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+
+            string? email = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                Console.WriteLine("Error: Email cannot be empty.");
+                break;
+            }
+            else if (!Regex.IsMatch(email, emailPattern))
+            {
+                Console.WriteLine("Error: Please enter a valid email address (e.g., user@example.com).");
+                break;
+            }
+Console.Write("Enter House Address: ");
+            string? address = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                Console.WriteLine("Error: Address cannot be empty.");
+                break;
+            }
+Console.Write("Enter Phone Number: ");
+            string? phoneNumber = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                Console.WriteLine("Error: Phone Number cannot be empty.");
+                break;
+            }
+
+            LibraryUser NewUser = new LibraryUser
+            {
+                UserId = nextUserID,
+                Name = userName,
+                Email = email,
+                Address = address,
+                PhoneNumber = phoneNumber
+            };
+
+            users.Add(NewUser);
+            Console.WriteLine($"User: {userName} added succesfully");
             break;
+
+
         case 4:
 
             Console.WriteLine("\n--- View all Users ---");
+if (users.Count == 0)
+{
+    Console.WriteLine("No users found. Please add a user first");
+}
+else
+{
+     // 2. Table Headers (Negative numbers = left align, Positive = right align)
+        Console.WriteLine($"{"ID",-5} | {"Full Name",-20} | {"Email",-25} | {"Address",-35} | {"Phone Number",-35}");
+        Console.WriteLine(new string('-', 110)); // Separator line
+
+    foreach (var u in users)
+    {
+        Console.WriteLine($"{u.UserId,-5} | {u.Name,-20} | {u.Email,-25} | {u.Address,-35} | {u.PhoneNumber,-35}");
+    }
+}
+
 
             break;
         case 5:
