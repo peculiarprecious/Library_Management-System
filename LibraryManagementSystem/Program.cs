@@ -101,7 +101,9 @@ while (isRunning)
     Console.WriteLine("5. Borrow Book");
     Console.WriteLine("6. View Borrowed Books");
     Console.WriteLine("7. Return Book");
-    Console.WriteLine("8. Exit");
+    Console.WriteLine("8. Search Book by Title or Author");
+    Console.WriteLine("9. Search User by Name");
+    Console.WriteLine("10. Exit");
 
     Console.Write("Enter choice: ");
     int userChoice = int.Parse(Console.ReadLine() ?? "");
@@ -406,6 +408,62 @@ while (isRunning)
 
             break;
         case 8:
+            Console.WriteLine("\n--- Search Book by Author or Title ---");
+
+            Console.WriteLine("Enter Book Titleor  Author");
+
+            string? input = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                Console.WriteLine("Error: Field cannot be empty.");
+                break;
+            }
+
+            var bTitleOrAuthor = books.Find(a => a.Author.Contains(input, StringComparison.OrdinalIgnoreCase) || a.Title.Contains(input, StringComparison.OrdinalIgnoreCase));
+            if (bTitleOrAuthor != null)
+            {
+                Console.WriteLine($"\nBook Found: {bTitleOrAuthor.Title} by {bTitleOrAuthor.Author}");
+
+                if (bTitleOrAuthor.AvailableCopies > 0)
+                {
+                    Console.WriteLine($"Status: [Available] - {bTitleOrAuthor.AvailableCopies} copies on shelf.");
+                }
+                else
+                {
+                    Console.WriteLine("Status: [Not Available] - All copies are currently borrowed.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Error: No book found matching '{input}'.");
+            }
+
+            break;
+        case 9:
+            Console.WriteLine("\n--- Search User by Name ---");
+
+            Console.Write("Enter User Name");
+            string? userInput = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(userInput))
+            {
+                Console.WriteLine("Field cannot be empty");
+                break;
+            }
+            var userName1 = users.Find(n => n.Name.Contains(userInput, StringComparison.OrdinalIgnoreCase));
+            if (userName1 != null)
+            {
+                Console.WriteLine($"\nUser Found: {userName1.Name}");
+            }
+            else
+            {
+                Console.WriteLine($"Error: No user found matching '{userInput}'.");
+            }
+
+
+            break;
+        case 10:
             isRunning = false;
             Console.WriteLine("Exiting program...");
             break;
@@ -417,3 +475,4 @@ while (isRunning)
     }
 
 }
+
